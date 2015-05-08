@@ -20,7 +20,7 @@ function createTabularData(histories) {
 	}
 	
 	for (var k in tests) {
-		tests.objectOwnPropert(k) && testsArray.push(k);
+		tests.hasOwnProperty(k) && testsArray.push(k);
 	}
 	
 	for (var k in dates) {

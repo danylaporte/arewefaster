@@ -1,15 +1,14 @@
 var Stats = require('fast-stats').Stats;
 
-function TestRunner(test, options, cb) {
+function TestRunner(func, options, cb) {
     this.cb = cb;
     this.done = this.done.bind(this);
     this.duration = 0;
     this.execute = this.execute.bind(this);
-    this.func = test.func;
-    this.name = test.name;
+    this.func = func;
     this.options = {
         maxDuration: options.maxDuration || 1000,
-        maxSample: options.maxSample || 1000
+        maxSample: options.maxSample || 10000
     };
     this.start = null;
     this.stats = new Stats({ sampling: true, store_data: false });
@@ -32,13 +31,13 @@ TestRunner.prototype = {
             var r = this.stats.range();
             
             this.cb({
-                avg: Math.round(avg*100)/100,
+                avg: Math.round(avg*10000)/10000,
                 duration: Math.round(this.duration*100)/100,
                 errorMargin: Math.round((this.stats.moe()/avg)*10000)/100,
-                name: this.name,
-                max: Math.round(r[1]*100)/100,
-                min: Math.round(r[0]*100)/100,
-                sd: Math.round(this.stats.σ()*100)/100
+                max: Math.round(r[1]*10000)/10000,
+                min: Math.round(r[0]*10000)/10000,
+                sd: Math.round(this.stats.σ()*100)/100,
+                samples: this.stats.length
             });
         }
     }
