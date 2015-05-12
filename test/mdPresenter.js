@@ -3,22 +3,29 @@ var should = require('should');
 
 describe('mdPresenter', function () {
 	it('should returns a markdown', function (done) {
-		var result = mdPresenter({
-			'2015-05-10T11:06:46.657Z': {
-				'suite1': {
-					'test1': {
-						avg: 1,
-						err: 5
-					},
-					'test2': {
-						avg: 2,
-						err: 4
-					}
-				}
-			}
-		});
 		
-		console.log(result);
-		done();
+		mdPresenter({
+			name: 'sampleSuite',
+			type: 'suite-result',
+			tests: [
+				{
+					avg: 1,
+					err: 5,
+					name: 'sampleTest1',
+					type: 'test-result'
+				},
+				{
+					avg: 2,
+					err: 4,
+					name: 'sampleTest2',
+					type: 'test-result'
+				}
+			]
+		}, callback);
+		
+		function callback(err, result) {
+			console.log(result);
+			done();
+		}
 	});
 })
