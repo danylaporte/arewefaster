@@ -1,19 +1,20 @@
-var SuiteRunner = require('./suiteRunner');
-var TestRunner = require('./testRunner');
+var suiteRunner = require('./suiteRunner');
+var testRunner = require('./testRunner');
 
 module = {
-	evaluateFunc: function (func, options, cb) {
-		if (typeof options === 'function') {
-			cb = options;
-			options = {};
+	run: function (testOrSuite, cb) {
+		switch(testOrSuite && testOrSuite.type) {
+			case 'suite':
+				return suiteRunner(testOrSuite, cb);
+			case 'test':
+				return testRunner(testOrSuite, cb);
+			default:
+				throw new Error('not a valid test or suite.');
 		}
-		new TestRunner(func, options, cb).execute();
 	},
-	evaluateSuite: function (suite, options, cb) {
-		if (typeof options === 'function') {
-			cb = options;
-			options = {};
+	presenters: {
+		markdown: function (history) {
+			return require('./presenters/mdPresenter')(history);
 		}
-		new SuiteRunner(suite, options, cb).execute();
 	}
 }

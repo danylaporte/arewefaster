@@ -1,36 +1,47 @@
-var TestRunner = require('./testRunner');
+var testRunner = require('./testRunner');
+var util = require('./util');
 
-function SuiteRunner(tests, options, cb) {
+function SuiteRunner(suite, cb) {
     this.cb = cb;
     this.done = this.done.bind(this);
     this.execute = this.execute.bind(this);
-    this.results = [];
-    this.tests = [];
-    this.testName = null;
-    
-    for (var k in tests) {
-        var func = tests.hasOwnProperty(k) && tests[k];
-        typeof func === 'function' && this.tests.unshift({
-            name: k, 
-            runner: new TestRunner(func, options, this.done)
-        });
-    }
+    this.name = suite.name;
+    this.suiteResults = [];
+    this.suites = util.cloneArray(suite.suites);
+    this.testResults = [];
+    this.tests = util.cloneArray(suite.tests);
 }
 
 SuiteRunner.prototype = {
     done: function (results) {
-        this.results.push({ name: this.testName, results: results });
+        switch (results.type) {
+            case 'test-result':
+                this.testResults.push(results);
+                break;                
+            case 'suite-result':
+                this.suiteResults.push(results);
+                break;
+        }
         process.nextTick(this.execute);
     },
     execute: function () {
         var test = this.tests.pop();
-        if (test) {
-            this.testName = test.name;
-            test.runner.execute();
-        } else {
-            this.cb(this.results);
-        }
+        if (test) return testRunner(test, this.done);
+        
+        var suite = this.suites.pop();
+        if (suite) return runSuite(suite, this.done);
+        
+        this.cb({
+            name: this.name,
+            tests: this.testResults,
+            suites: this.suiteResults,
+            type: 'suite-result'
+        });
     }
 }
 
-module.exports = SuiteRunner;
+function runSuite(suite, cb) {
+    new SuiteRunner(suite, cb).execute();
+}
+
+module.exports = runSuite;
