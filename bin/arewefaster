@@ -1,0 +1,23 @@
+var fs = require('fs');
+var glob = require('glob');
+var path = require('path');
+var program = require('commander');
+var awf = require('../src');
+
+program
+	.version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+	.usage('[files]');
+
+program.name = 'arewefaster';
+
+program.parse(process.argv);
+
+var args = program.args;
+
+// default files to perf/*.{js,coffee}
+
+!args.length && args.push('../perf/*.js');
+
+glob(args[0], function (err, files) {
+	awf.runFiles(files, function () { });
+});
