@@ -1,15 +1,29 @@
+var debug = require('debug')('arewefaster:suiteRunner');
 var testRunner = require('./testRunner');
-var util = require('./util');
 
-function SuiteRunner(suite, cb) {
-    this.cb = cb;
+function cloneArray(array) {
+    if (!array) return [];
+	var newArray = new Array(array.length);
+	for (var i = 0; i < array.length; i++) {
+		newArray[i] = array[i];
+	}
+	return newArray;
+}
+
+function noop() { };
+
+function SuiteRunner(suite, options, cb) {
+    this.cb = cb || typeof options === 'function' && options || noop;
     this.done = this.done.bind(this);
     this.execute = this.execute.bind(this);
     this.name = suite.name;
+    this.options = options;
     this.suiteResults = [];
-    this.suites = util.cloneArray(suite.suites);
+    this.suites = cloneArray(suite.suites);
     this.testResults = [];
-    this.tests = util.cloneArray(suite.tests);
+    this.tests = cloneArray(suite.tests);
+    debug('start suite ' + suite.name);
+    this.emit('suite-start', suite.name);
 }
 
 SuiteRunner.prototype = {
@@ -24,24 +38,32 @@ SuiteRunner.prototype = {
         }
         process.nextTick(this.execute);
     },
+    emit: function (name, value) {
+        this.options && this.options.reporter && this.options.reporter.emit(name, value);
+    },
     execute: function () {
-        var test = this.tests.pop();
-        if (test) return testRunner(test, this.done);
+        var test = this.tests.shift();
+        if (test) return testRunner(test, this.options, this.done);
         
-        var suite = this.suites.pop();
-        if (suite) return runSuite(suite, this.done);
+        var suite = this.suites.shift();
+        if (suite) return runSuite(suite, this.options, this.done);
         
-        this.cb({
+        debug('suite ' + this.name + ' completed');
+        
+        var result = {
             name: this.name,
             tests: this.testResults,
             suites: this.suiteResults,
             type: 'suite-result'
-        });
+        };
+        
+        this.emit('suite-end', result);
+        this.cb(result);
     }
 }
 
-function runSuite(suite, cb) {
-    new SuiteRunner(suite, cb).execute();
+function runSuite(suite, options, cb) {
+    new SuiteRunner(suite, options, cb).execute();
 }
 
 module.exports = runSuite;

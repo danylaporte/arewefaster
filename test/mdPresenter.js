@@ -1,10 +1,10 @@
-var mdPresenter = require('../src/presenters/mdPresenter');
+var presenters = require('../src/presenters');
 var should = require('should');
 
 describe('mdPresenter', function () {
 	it('should returns a markdown', function (done) {
 		
-		mdPresenter({
+		presenters.md({
 			name: 'sampleSuite',
 			type: 'suite-result',
 			tests: [
