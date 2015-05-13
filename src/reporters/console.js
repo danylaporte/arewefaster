@@ -15,16 +15,16 @@ ConsoleReporter.prototype = {
 				value && this.write(value);
 				this.indent++;
 				break;
-				
+
 			case 'suite-end':
 				this.writeFastest();
 				console.log();
 				this.indent--;
 				break;
-			
+
 			case 'test-start':
 				break;
-				
+
 			case 'test-end':
 				this.write(value.name + ' ' + value.avg + 'ms ± ' + value.err + '% (' + value.samples + ' samples)');
 				this.testResults.push(value);
@@ -37,7 +37,7 @@ ConsoleReporter.prototype = {
 			s += '  ';
 		}
 		s += text;
-		console.log(s);	
+		console.log(s);
 	},
 	writeFastest: function () {
 		if (this.testResults.length > 1) {
@@ -45,9 +45,9 @@ ConsoleReporter.prototype = {
 			var fastest = this.testResults[0];
 			var second = this.testResults[1];
 			console.log();
-			this.write(fastest.name + ' is ' + Math.round(fastest.avg * 100 / second.avg) / 100 + 'x faster than ' + second.name); 
+			this.write(fastest.name + ' is ' + Math.round(second.avg * 100 / fastest.avg) / 100 + 'x faster than ' + second.name);
 		}
-		
+
 		this.testResults.length = 0;
 	}
 }

@@ -4,58 +4,59 @@ var Stats = require('fast-stats').Stats;
 function noop() { };
 
 function TestRunner(test, options, cb) {
-	this.cb = cb || typeof options === 'function' && options || noop;
-	this.done = this.done.bind(this);
-	this.execute = this.execute.bind(this);
+    this.cb = cb || typeof options === 'function' && options || noop;
+    this.done = this.done.bind(this);
+    this.execute = this.execute.bind(this);
     this.options = options;
-	this.start = null;
-	this.startDate = new Date();
-	this.stats = new Stats();
+    this.start = null;
+    this.startDate = new Date();
+    this.stats = new Stats();
     this.test = test;
+    
     debug('start test ' + test.name);
     this.emit('test-start', test.name);
 }
 
 TestRunner.prototype = {
-	done: function () {
-        this.stats.push(process.hrtime(this.start)[1]/1000000); // nano to ms
+    done: function () {
+        this.stats.push(process.hrtime(this.start)[1] / 1000000); // nano to ms
         process.nextTick(this.execute);
     },
     emit: function (name, value) {
         this.options && this.options.reporter && this.options.reporter.emit(name, value);
     },
-	execute: function () {
-		var avg = this.stats.amean();
-		var err = Math.round((this.stats.moe()/avg)*10000)/100;
-        var hasReachedErrMargin = this.stats.length > 2 && err > (this.test.targetError || 5);
-        
-        if (new Date() - this.startDate < this.test.maxDuration || hasReachedErrMargin) {
-            
-            this.start = process.hrtime();
-            this.test.func(this.done);
-            
-        } else {
+    execute: function () {
+        var avg = this.stats.amean();
+        var err = Math.round((this.stats.moe() / avg) * 10000) / 100;
+        var hasTimeout = new Date() - this.startDate >= (this.test.maxDuration || 1000);
+        var hasReachedErrMargin = this.stats.length > 2 && err < (this.test.targetError || 5);
+
+        if (hasTimeout || hasReachedErrMargin) {
+
             var r = this.stats.range();
-            
+
             debug('test ' + this.test.name + ' completed after ' + this.stats.length + ' iterations');
-            
+
             var result = {
-                avg: Math.round(avg*10000)/10000,
+                avg: Math.round(avg * 10000) / 10000,
                 err: err,
-                max: Math.round(r[1]*10000)/10000,
-                min: Math.round(r[0]*10000)/10000,
+                max: Math.round(r[1] * 10000) / 10000,
+                min: Math.round(r[0] * 10000) / 10000,
                 name: this.test.name,
                 samples: this.stats.length,
-                sd: Math.round(this.stats.σ()*100)/100,
+                sd: Math.round(this.stats.σ() * 100) / 100,
                 type: 'test-result'
             };
-            
+
             this.emit('test-end', result);
             this.cb(result);
+        } else {
+            this.start = process.hrtime();
+            this.test.func(this.done);
         }
-	}
+    }
 };
 
 module.exports = function (test, options, cb) {
-	new TestRunner(test, options, cb).execute();
+    new TestRunner(test, options, cb).execute();
 };

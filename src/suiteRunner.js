@@ -3,11 +3,13 @@ var testRunner = require('./testRunner');
 
 function cloneArray(array) {
     if (!array) return [];
-	var newArray = new Array(array.length);
-	for (var i = 0; i < array.length; i++) {
-		newArray[i] = array[i];
-	}
-	return newArray;
+    var newArray = new Array(array.length);
+    
+    for (var i = 0; i < array.length; i++) {
+        newArray[i] = array[i];
+    }
+    
+    return newArray;
 }
 
 function noop() { };
@@ -31,7 +33,7 @@ SuiteRunner.prototype = {
         switch (results.type) {
             case 'test-result':
                 this.testResults.push(results);
-                break;                
+                break;
             case 'suite-result':
                 this.suiteResults.push(results);
                 break;
@@ -44,19 +46,19 @@ SuiteRunner.prototype = {
     execute: function () {
         var test = this.tests.shift();
         if (test) return testRunner(test, this.options, this.done);
-        
+
         var suite = this.suites.shift();
         if (suite) return runSuite(suite, this.options, this.done);
-        
+
         debug('suite ' + this.name + ' completed');
-        
+
         var result = {
             name: this.name,
             tests: this.testResults,
             suites: this.suiteResults,
             type: 'suite-result'
         };
-        
+
         this.emit('suite-end', result);
         this.cb(result);
     }
