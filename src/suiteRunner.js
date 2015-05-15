@@ -1,4 +1,3 @@
-var debug = require('debug')('arewefaster:suiteRunner');
 var testRunner = require('./testRunner');
 var utils = require('./utils');
 
@@ -12,7 +11,6 @@ function SuiteRunner(suite, options, cb) {
     this.suites = utils.cloneArray(suite.suites);
     this.testResults = [];
     this.tests = utils.cloneArray(suite.tests);
-    debug('start suite ' + suite.name);
     this.emit('suite-start', suite.name);
 }
 
@@ -45,8 +43,6 @@ SuiteRunner.prototype = {
 
         var suite = this.suites.shift();
         if (suite) return runSuite(suite, this.options, this.done);
-
-        debug('suite ' + this.name + ' completed');
 
         var result = {
             name: this.name,

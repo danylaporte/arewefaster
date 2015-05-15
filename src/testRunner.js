@@ -1,4 +1,3 @@
-var debug = require('debug')('arewefaster:testRunner');
 var Stats = require('fast-stats').Stats;
 var utils = require('./utils');
 
@@ -12,7 +11,6 @@ function TestRunner(test, options, cb) {
     this.stats = new Stats();
     this.test = test;
 
-    debug('start test ' + test.name);
     this.emit('test-start', test.name);
 }
 
@@ -33,8 +31,6 @@ TestRunner.prototype = {
         if (hasTimeout || hasReachedErrMargin) {
 
             var r = this.stats.range();
-
-            debug('test ' + this.test.name + ' completed after ' + this.stats.length + ' iterations');
 
             var result = {
                 avg: Math.round(avg * 10000) / 10000,
