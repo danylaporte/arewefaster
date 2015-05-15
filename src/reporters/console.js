@@ -1,6 +1,4 @@
-function avgComparer(a, b) {
-	return a.avg - b.avg;
-}
+var utils = require('../utils');
 
 function ConsoleReporter() {
 	this.indent = 0;
@@ -41,11 +39,8 @@ ConsoleReporter.prototype = {
 	},
 	writeFastest: function () {
 		if (this.testResults.length > 1) {
-			this.testResults.sort(avgComparer);
-			var fastest = this.testResults[0];
-			var second = this.testResults[1];
 			console.log();
-			this.write(fastest.name + ' is ' + Math.round(second.avg * 100 / fastest.avg) / 100 + 'x faster than ' + second.name);
+			this.write(utils.fastestVsSecond(this.testResults));
 		}
 
 		this.testResults.length = 0;

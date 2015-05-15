@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var utils = require('../utils');
 
 function present(data, cb) {
 	switch (data.type) {
@@ -17,7 +18,7 @@ function present(data, cb) {
 };
 
 function testInfo(test) {
-	return test.avg + 'ms ±' + test.err + '%';
+	return test.avg + 'ms ± ' + test.err + '%';
 }
 
 function header(title, indent) {
@@ -34,13 +35,15 @@ function renderSuite(suite, indent) {
 	var i;
 
 	if (suite.tests && suite.tests.length) {
-		s += '\r\n|   |Value|';
+		s += '\r\n|name|time ± error margin|';
 		s += '\r\n|---|-----|';
 
 		for (i = 0; i < suite.tests.length; i++) {
 			var test = suite.tests[i];
 			s += '\r\n|' + test.name + '|' + testInfo(test) + '|';
 		}
+		
+		if (suite.tests.length > 1) s += '\r\n' + utils.fastestVsSecond(suite.tests);
 		
 		s += '\r\n';
 	}
@@ -62,6 +65,10 @@ present.writeFile = function (filename) {
 	filename = path.resolve(filename);
 	return function (data, cb) {
 		present(data, function (err, value) {
+			value = '#Performance'
+				+ '\r\nStats are provided by [arewefaster](https://github.com/danylaporte/arewefaster)\r\n\r\n'
+				+ value;
+			
 			err ? cb && cb(err) : fs.writeFile(filename, value, cb);	
 		});
 	};
