@@ -1,7 +1,5 @@
 # arewefaster
-Benchmark functions and compare result with other implementation over time
-
-This is a lightweight reimplementation of [RxJS](https://github.com/Reactive-Extensions/RxJS) with speed in mind.
+Benchmark functions and compare result with other implementation over time.
 
 ## Installation
 
@@ -11,13 +9,13 @@ $ npm install arewefaster
 
 ##Usage
 
-###command-line
+**command-line**
 
 ```bash
 $ arewefaster [options] <files>
 ``` 
 
-###api
+**api**
 
 ```js
 var arewefaster = require('arewefaster');
@@ -26,7 +24,7 @@ arewefaster(suite, function (err, result) {
 });
 ```
 
-###interface
+**interface**
 ```js
 suite('Benchmarking timeouts', function() {
 	
