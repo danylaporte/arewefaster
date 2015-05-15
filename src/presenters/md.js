@@ -1,4 +1,7 @@
-module.exports = function (data, cb) {
+var fs = require('fs');
+var path = require('path');
+
+function present(data, cb) {
 	switch (data.type) {
 		case 'suite-result':
 			cb(null, renderSuite(data, 0));
@@ -27,7 +30,7 @@ function header(title, indent) {
 }
 
 function renderSuite(suite, indent) {
-	var s = header(suite.name, indent) + '\r\n';
+	var s = suite.name ? header(suite.name, indent) + '\r\n' : '';
 	var i;
 
 	if (suite.tests && suite.tests.length) {
@@ -38,6 +41,8 @@ function renderSuite(suite, indent) {
 			var test = suite.tests[i];
 			s += '\r\n|' + test.name + '|' + testInfo(test) + '|';
 		}
+		
+		s += '\r\n';
 	}
 
 	if (suite.suites && suite.suites.length) {
@@ -52,3 +57,14 @@ function renderSuite(suite, indent) {
 function renderTest(test) {
 	return test.name + ': ' + testInfo(test);
 }
+
+present.writeFile = function (filename) {
+	filename = path.resolve(filename);
+	return function (data, cb) {
+		present(data, function (err, value) {
+			err ? cb && cb(err) : fs.writeFile(filename, value, cb);	
+		});
+	};
+};
+
+module.exports = present;

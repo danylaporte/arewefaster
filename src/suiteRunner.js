@@ -1,44 +1,40 @@
 var debug = require('debug')('arewefaster:suiteRunner');
 var testRunner = require('./testRunner');
-
-function cloneArray(array) {
-    if (!array) return [];
-    var newArray = new Array(array.length);
-    
-    for (var i = 0; i < array.length; i++) {
-        newArray[i] = array[i];
-    }
-    
-    return newArray;
-}
-
-function noop() { };
+var utils = require('./utils');
 
 function SuiteRunner(suite, options, cb) {
-    this.cb = cb || typeof options === 'function' && options || noop;
+    this.cb = cb || typeof options === 'function' && options || utils.noop;
     this.done = this.done.bind(this);
     this.execute = this.execute.bind(this);
     this.name = suite.name;
     this.options = options;
     this.suiteResults = [];
-    this.suites = cloneArray(suite.suites);
+    this.suites = utils.cloneArray(suite.suites);
     this.testResults = [];
-    this.tests = cloneArray(suite.tests);
+    this.tests = utils.cloneArray(suite.tests);
     debug('start suite ' + suite.name);
     this.emit('suite-start', suite.name);
 }
 
 SuiteRunner.prototype = {
-    done: function (results) {
-        switch (results.type) {
-            case 'test-result':
-                this.testResults.push(results);
-                break;
-            case 'suite-result':
-                this.suiteResults.push(results);
-                break;
+    done: function (err, results) {
+        if (err) {
+            this.cb(err);
+        } else {
+
+            switch (results.type) {
+
+                case 'test-result':
+                    this.testResults.push(results);
+                    break;
+
+                case 'suite-result':
+                    this.suiteResults.push(results);
+                    break;
+            }
+
+            process.nextTick(this.execute);
         }
-        process.nextTick(this.execute);
     },
     emit: function (name, value) {
         this.options && this.options.reporter && this.options.reporter.emit(name, value);
@@ -60,7 +56,7 @@ SuiteRunner.prototype = {
         };
 
         this.emit('suite-end', result);
-        this.cb(result);
+        this.cb(null, result);
     }
 }
 

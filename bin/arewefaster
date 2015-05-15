@@ -7,7 +7,8 @@ var program = require('commander');
 
 program
 	.version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
-	.usage('[files]');
+	.option('--markdown <filename>', 'save the output in markdown')
+	.usage('[options] <files>');
 
 program.name = 'arewefaster';
 
@@ -17,6 +18,16 @@ var args = program.args;
 
 !args.length && args.push('./perf/*.js');
 
+var options = {
+	presenters: getPresenters()
+};
+
 glob(args[0], function (err, files) {
-	awf.runFiles(files, function () { });
+	awf.runFiles(files, options, function () { });
 });
+
+function getPresenters() {
+	var array = [];
+	if (program.markdown) array.push(awf.presenters.md.writeFile(program.markdown));
+	return array;
+}
