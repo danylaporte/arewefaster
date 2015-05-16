@@ -1,6 +1,6 @@
 {
   "name": "arewefaster",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Benchmark functions and compare result with other implementation over time",
   "main": "index.js",
   "scripts": {
