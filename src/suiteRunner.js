@@ -31,7 +31,7 @@ SuiteRunner.prototype = {
                     break;
             }
 
-            process.nextTick(this.execute);
+            setImmediate(this.execute);
         }
     },
     emit: function (name, value) {

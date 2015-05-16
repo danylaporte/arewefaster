@@ -17,7 +17,7 @@ function TestRunner(test, options, cb) {
 TestRunner.prototype = {
     done: function () {
         this.stats.push(process.hrtime(this.start)[1] / 1000000); // nano to ms
-        process.nextTick(this.execute);
+        setImmediate(this.execute);
     },
     emit: function (name, value) {
         this.options && this.options.reporter && this.options.reporter.emit(name, value);
