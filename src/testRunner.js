@@ -34,13 +34,13 @@ TestRunner.prototype = {
             var r = this.stats.range();
 
             var result = {
-                avg: Math.round(avg * 10000) / 10000,
+                avg: avg,
                 err: err,
-                max: Math.round(r[1] * 10000) / 10000,
-                min: Math.round(r[0] * 10000) / 10000,
+                max: r[1],
+                min: r[0],
                 name: this.test.name,
                 samples: this.stats.length,
-                sd: Math.round(this.stats.σ() * 100) / 100,
+                sd: this.stats.σ(),
                 type: 'test-result'
             };
 
