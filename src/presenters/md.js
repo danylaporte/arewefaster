@@ -18,7 +18,7 @@ function present(data, cb) {
 };
 
 function testInfo(test) {
-	return Math.round(100000 / test.avg) / 100 + 'ops ± ' + test.err + '%';
+	return utils.formatNumber(1000 / test.avg) + ' ops ± ' + test.err + '%';
 }
 
 function header(title, indent) {

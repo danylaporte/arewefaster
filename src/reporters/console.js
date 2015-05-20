@@ -24,7 +24,7 @@ ConsoleReporter.prototype = {
 				break;
 
 			case 'test-end':
-				this.write(value.name + ' ' + value.avg + 'ms ± ' + value.err + '% (' + value.samples + ' samples)');
+				this.write(value.name + ' ' + utils.formatNumber(1000 / value.avg) + ' ops ± ' + utils.formatNumber(value.err, 2) + '% (' + utils.formatNumber(value.samples, 0) + ' samples)');
 				this.testResults.push(value);
 				break;
 		}
